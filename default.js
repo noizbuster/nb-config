@@ -58,8 +58,8 @@ Default.prototype.getConfigsSync = function () {
     console.log(this.CONFIG_PATH);
     return JSON.parse(fs.readFileSync(this.CONFIG_PATH));
 }
-Default.prototype.setConfig = function (key, value) {
-    var tempFilePath = path.join(process.cwd(), this.CONFIG_PATH + '.temp');
+Default.prototype.setConfigSync = function (key, value) {
+    var tempFilePath = path.join(this.CONFIG_PATH + '.temp');
     // fse.copySync(CONFIG_PATH, tempFilePath);
     var oldSettings = JSON.parse(fs.readFileSync(this.CONFIG_PATH));
     oldSettings[key] = value;
@@ -69,8 +69,8 @@ Default.prototype.setConfig = function (key, value) {
     });
     return true;
 }
-Default.prototype.setConfigs = function (settings) {
-    var tempFilePath = path.join(process.cwd(), this.CONFIG_PATH + '.temp');
+Default.prototype.setConfigsSync = function (settings) {
+    var tempFilePath = path.join(this.CONFIG_PATH + '.temp');
     // fse.copySync(CONFIG_PATH, tempFilePath);
     var oldSettings = JSON.parse(fs.readFileSync(this.CONFIG_PATH));
     for (var key in settings) {

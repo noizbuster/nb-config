@@ -9,3 +9,7 @@ console.log('CONFIG: ', configManager.CONFIG_PATH);
 console.log('DEFAULT: ', configManager.DEFAULT_PATH);
 var configs = configManager.getConfigsSync();
 console.log(configs);
+
+configManager.setConfigSync("testString", 'new value !!!');
+var configse = configManager.getConfigsSync();
+console.log(configse);
