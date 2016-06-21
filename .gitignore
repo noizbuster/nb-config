@@ -35,3 +35,12 @@ jspm_packages
 
 # Optional REPL history
 .node_repl_history
+
+# specific files
+tests/user_config.json
+
+# specific directories
+temp
+
+# specific file extension
+*.swp
