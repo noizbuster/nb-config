@@ -1,0 +1,27 @@
+{
+  "name": "default.js",
+  "version": "0.0.1",
+  "description": "simple default or user configuration manager",
+  "main": "default.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/noizbuster/default.js.git"
+  },
+  "keywords": [
+    "default",
+    "configuration",
+    "config"
+  ],
+  "author": "Noizbuster",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/noizbuster/default.js/issues"
+  },
+  "homepage": "https://github.com/noizbuster/default.js#readme",
+  "dependencies": {
+    "fs-extra": "^0.30.0"
+  }
+}
