@@ -41,6 +41,7 @@ tests/user_config.json
 
 # specific directories
 temp
+.idea/
 
 # specific file extension
 *.swp

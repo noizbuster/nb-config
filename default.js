@@ -2,38 +2,35 @@ var path = require('path');
 var fs = require('fs');
 var fse = require('fs-extra');
 
-//var DEFAULT_PATH = path.join(process.cwd(), DEFAULT_PATH);
-//var CONFIG_PATH = path.join(process.cwd(), CONFIG_PATH);
-
-var Default = function(DEFAULT_PATH_PATH, USER_CONFIG_PATH) {
+var Default = function (DEFAULT_PATH_PATH, USER_CONFIG_PATH) {
     this.DEFAULT_PATH = DEFAULT_PATH_PATH;
     this.CONFIG_PATH = USER_CONFIG_PATH;
-}
+};
 
-//Default.constructor = function(DEFAULT_PATH_PATH, USER_CONFIG_PATH) {
-    //this.DEFAULT_PATH = DEFAULT_PATH_PATH;
-    //this.CONFIG_PATH = USER_CONFIG_PATH;
-//}
-
-Default.prototype.init = function(callback) {
-    var error;
+// initialize and validate configuration files
+Default.prototype.init = function (callback) {
     stat = fs.stat(this.CONFIG_PATH, function (err, stats) {
-        error = err;
         if (err) {
-            // TODO rename
-            // TODO replace to async
             console.info('userconfig not exist, copy from default');
-            this.copyDefaultSync();
+            this.copyDefault(function (error) {
+                if (error) {
+                    console.error(error);
+                    callback(error);
+                }
+                else {
+                    callback(null);
+                }
+            });
         }
         else {
             console.info('userconfig exist');
+            callback(null);
         }
-        callback(error, stat);
     });
-}
-Default.prototype.initSync = function() {
+};
+Default.prototype.initSync = function () {
     console.log('try to init:', this.CONFIG_PATH);
-    try{
+    try {
         if (!fs.statSync(this.CONFIG_PATH)) {
             console.info('userconfig not exist, copy from default');
             // TODO rename
@@ -43,43 +40,120 @@ Default.prototype.initSync = function() {
             console.info('userconfig exist');
         }
     }
-    catch(e) {
+    catch (e) {
         console.info('userconfig not exist, copy from default');
         this.copyDefaultSync();
     }
-}
+};
+
+// make initial user configuration file from default configuration file
 Default.prototype.copyDefaultSync = function () {
     fse.copySync(this.DEFAULT_PATH, this.CONFIG_PATH);
-}
-Default.prototype.copyDefault = function() {
-}
-Default.prototype.getConfigsSync = function () {
-    this.initSync();
-    console.log(this.CONFIG_PATH);
-    return JSON.parse(fs.readFileSync(this.CONFIG_PATH));
-}
-Default.prototype.setConfigSync = function (key, value) {
-    var tempFilePath = path.join(this.CONFIG_PATH + '.temp');
-    // fse.copySync(CONFIG_PATH, tempFilePath);
-    var oldSettings = JSON.parse(fs.readFileSync(this.CONFIG_PATH));
-    oldSettings[key] = value;
-    fse.writeJsonSync(tempFilePath, oldSettings);
-    fse.move(tempFilePath, this.CONFIG_PATH, {clobber: true}, function () {
-        return false
+};
+Default.prototype.copyDefault = function () {
+    fse.copy(this.DEFAULT_PATH, this.CONFIG_PATH, function (error) {
+        if (error) {
+            return console.error(error);
+        }
+        else {
+            console.log("copied default configuration file");
+        }
     });
-    return true;
-}
+};
+
+// read whole config from configuration file
+Default.prototype.readConfigsSync = function () {
+    this.initSync();
+    return fse.readJsonSync(this.CONFIG_PATH);
+};
+Default.prototype.readConfigs = function (callback) {
+    this.init(function (error, status) {
+        if (error) {
+            console.error(error, status);
+            callback(error);
+            return null;
+        }
+        else {
+            fse.readJson(this.CONFIG_PATH, function (error, data) {
+                if (error) {
+                    callback(error);
+                    console.error(error);
+                    return null;
+                }
+                else {
+                    callback(null, data);
+                    return data;
+                }
+            });
+        }
+    });
+};
+
+// set config, key value input
+Default.prototype.setConfigSync = function (key, value) {
+    var settings = this.getConfigsSync();
+    settings[key] = value;
+    return this.setConfigsSync(settings);
+};
+Default.prototype.setConfig = function (key, value, callback) {
+    this.readConfigs(function (error, data) {
+        if (error) {
+            callback(error);
+            return false;
+        }
+        else {
+            var settings = data;
+            settings[key] = value;
+            this.setConfigs(settings, function (err) {
+                if (err) {
+                    console.error(err);
+                    callback(err);
+                    return false;
+                }
+                else {
+                    callback(null);
+                    return true;
+                }
+            });
+        }
+    });
+};
+
+// set configs, json input
 Default.prototype.setConfigsSync = function (settings) {
     var tempFilePath = path.join(this.CONFIG_PATH + '.temp');
-    // fse.copySync(CONFIG_PATH, tempFilePath);
-    var oldSettings = JSON.parse(fs.readFileSync(this.CONFIG_PATH));
-    for (var key in settings) {
-        oldSettings[key] = settings[key];
-    }
-    fse.writeJsonSync(tempFilePath, oldSettings);
-    fse.move(tempFilePath, this.CONFIG_PATH, {clobber: true}, function () {
-        return false
+    fse.writeJsonSync(tempFilePath, settings);
+    fse.move(tempFilePath, this.CONFIG_PATH, {clobber: true}, function (err) {
+        if (err) {
+            return false;
+        }
+        else {
+            return true;
+        }
     });
-}
+};
+Default.prototype.setConfigs = function (settings, callback) {
+    var tempFilePath = path.join(this.CONFIG_PATH + '.temp');
+    fse.writeJson(tempFilePath, settings, function (err) {
+        if (err) {
+            console.error(err);
+            callback(err);
+            return false;
+        }
+        else {
+            fse.move(tempFilePath, this.CONFIG_PATH, {clobber: true}, function (err) {
+                if (err) {
+                    callback(err);
+                    return false;
+                }
+                else {
+                    callback(null);
+                    return true;
+                }
+            });
+        }
+    });
+
+};
 
 module.exports = Default;
