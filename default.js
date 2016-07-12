@@ -91,7 +91,7 @@ Default.prototype.readConfigs = function (callback) {
 
 // set config, key value input
 Default.prototype.setConfigSync = function (key, value) {
-    var settings = this.getConfigsSync();
+    var settings = this.readConfigsSync();
     settings[key] = value;
     return this.setConfigsSync(settings);
 };
