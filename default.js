@@ -1,15 +1,17 @@
 var path = require('path');
 var fs = require('fs');
 var fse = require('fs-extra');
+var YAML = require('js-yaml');
 
 var Default = function (DEFAULT_PATH_PATH, USER_CONFIG_PATH) {
     this.DEFAULT_PATH = DEFAULT_PATH_PATH;
     this.CONFIG_PATH = USER_CONFIG_PATH;
+    this.ext = path.parse(this.CONFIG_PATH).ext.toLowerCase();
 };
 
 // initialize and validate configuration files
 Default.prototype.init = function (callback) {
-    stat = fs.stat(this.CONFIG_PATH, function (err, stats) {
+    var stat = fs.stat(this.CONFIG_PATH, function (err, stats) {
         if (err) {
             console.info('userconfig not exist, copy from default');
             this.copyDefault(function (error) {
@@ -23,21 +25,17 @@ Default.prototype.init = function (callback) {
             });
         }
         else {
-            console.info('userconfig exist');
             callback(null);
         }
     });
 };
 Default.prototype.initSync = function () {
-    console.log('try to init:', this.CONFIG_PATH);
     try {
         if (!fs.statSync(this.CONFIG_PATH)) {
             console.info('userconfig not exist, copy from default');
-            // TODO rename
             this.copyDefaultSync();
         }
         else {
-            console.info('userconfig exist');
         }
     }
     catch (e) {
@@ -48,11 +46,17 @@ Default.prototype.initSync = function () {
 
 // make initial user configuration file from default configuration file
 Default.prototype.copyDefaultSync = function () {
-    fse.copySync(this.DEFAULT_PATH, this.CONFIG_PATH);
+    try {
+        fse.copySync(this.DEFAULT_PATH, this.CONFIG_PATH);
+    }
+    catch (e) {
+        console.log("copied default configuration file");
+    }
 };
-Default.prototype.copyDefault = function () {
+Default.prototype.copyDefault = function (callback) {
     fse.copy(this.DEFAULT_PATH, this.CONFIG_PATH, function (error) {
         if (error) {
+            callback(error);
             return console.error(error);
         }
         else {
@@ -64,29 +68,57 @@ Default.prototype.copyDefault = function () {
 // read whole config from configuration file
 Default.prototype.readConfigsSync = function () {
     this.initSync();
-    return fse.readJsonSync(this.CONFIG_PATH);
+    if (this.ext === '.json') {
+        return fse.readJsonSync(this.CONFIG_PATH);
+    }
+    else if (this.ext === '.yaml' || this.ext === '.yml') {
+        return YAML.safeLoad(fs.readFileSync(this.CONFIG_PATH, 'utf8', null, json = true));
+    }
+    else {
+        console.log('invalid file extension : default.js support JSON, YAML, YML only');
+        return undefined;
+    }
 };
 Default.prototype.readConfigs = function (callback) {
-    this.init(function (error, status) {
-        if (error) {
-            console.error(error, status);
-            callback(error);
-            return null;
-        }
-        else {
-            fse.readJson(this.CONFIG_PATH, function (error, data) {
-                if (error) {
-                    callback(error);
-                    console.error(error);
-                    return null;
-                }
-                else {
-                    callback(null, data);
-                    return data;
-                }
-            });
-        }
-    });
+    if (this.ext === '.json') {
+        this.init(function (error, status) {
+            if (error) {
+                console.error(error, status);
+                callback(error);
+                return null;
+            }
+            else {
+                fse.readJson(this.CONFIG_PATH, function (error, data) {
+                    if (error) {
+                        callback(error);
+                        console.error(error);
+                        return null;
+                    }
+                    else {
+                        callback(null, data);
+                        return data;
+                    }
+                });
+            }
+        });
+    }
+    else if (this.ext === '.yaml' || this.ext === '.yml') {
+        this.init(function (error, status) {
+            if (error) {
+                console.error(error, status);
+                callback(error);
+                return null;
+            }
+            else {
+                return YAML.safeLoad(fs.readFileSync(this.CONFIG_PATH, 'utf8', null, json = true));
+            }
+        });
+    }
+    else {
+        console.log('invalid file extension : default.js support JSON, YAML, YML only');
+        callback(new Error());
+        return false;
+    }
 };
 
 // set config, key value input
@@ -121,39 +153,48 @@ Default.prototype.setConfig = function (key, value, callback) {
 
 // set configs, json input
 Default.prototype.setConfigsSync = function (settings) {
-    var tempFilePath = path.join(this.CONFIG_PATH + '.temp');
-    fse.writeJsonSync(tempFilePath, settings);
-    fse.move(tempFilePath, this.CONFIG_PATH, {clobber: true}, function (err) {
-        if (err) {
-            return false;
-        }
-        else {
-            return true;
-        }
-    });
+    if (this.ext === '.json') {
+        return fse.writeJsonSync(this.CONFIG_PATH, settings);
+    }
+    else if (this.ext === '.yaml' || this.ext === '.yml') {
+        return fs.writeFileSync(this.CONFIG_PATH, YAML.safeDump(settings), null);
+    }
+    else {
+        console.log('invalid file extension : default.js support JSON, YAML, YML only');
+        callback(new Error());
+        return false;
+    }
 };
 Default.prototype.setConfigs = function (settings, callback) {
-    var tempFilePath = path.join(this.CONFIG_PATH + '.temp');
-    fse.writeJson(tempFilePath, settings, function (err) {
-        if (err) {
-            console.error(err);
-            callback(err);
-            return false;
-        }
-        else {
-            fse.move(tempFilePath, this.CONFIG_PATH, {clobber: true}, function (err) {
-                if (err) {
-                    callback(err);
-                    return false;
-                }
-                else {
-                    callback(null);
-                    return true;
-                }
-            });
-        }
-    });
-
+    if (this.ext === '.json') {
+        fse.writeJson(this.CONFIG_PATH, settings, function (err) {
+            if (err) {
+                console.error(err);
+                callback(err);
+                return false;
+            }
+            else {
+                return true;
+            }
+        });
+    }
+    else if (this.ext === '.yaml' || this.ext === '.yml') {
+        fs.writeFile(this.CONFIG_PATH, YAML.safeDump(settings), null, function (err) {
+            if (err) {
+                console.error(err);
+                callback(err);
+                return false;
+            }
+            else {
+                return true;
+            }
+        });
+    }
+    else {
+        console.log('invalid file extension : default.js support JSON, YAML, YML only');
+        callback(new Error());
+        return false;
+    }
 };
 
 module.exports = Default;
