@@ -1,6 +1,6 @@
 {
   "name": "default.js",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "simple default or user configuration manager",
   "main": "default.js",
   "scripts": {
