@@ -38,6 +38,7 @@ jspm_packages
 
 # specific files
 tests/user_config.json
+tests/user_config.yaml
 
 # specific directories
 temp
