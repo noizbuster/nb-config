@@ -125,6 +125,11 @@ docker run -ti (imageName) -v CustomConfigurationFilePath(host):userConfigPath(i
 
 ---
 
+### Additional Features for Building
+- **ESLint:** true
+- **Travis CI**: true
+- **Code Coverage**: true
+
 # License
 Copyright 2016 Noizbuster \<noizbuster@noizbuster.com\>
 
