@@ -4,7 +4,9 @@
   "description": "simple default or user configuration manager",
   "main": "default.js",
   "scripts": {
-    "test": "node test"
+    "test": "mocha --compilers js:babel-register --recursive",
+    "test:cov": "babel-node ./node_modules/isparta/bin/isparta cover ./node_modules/mocha/bin/_mocha -- --recursive",
+    "test:watch": "npm test -- --watch"
   },
   "repository": {
     "type": "git",
@@ -25,8 +27,11 @@
     "fs-extra": "^0.30.0",
     "js-yaml": "^3.6.1"
   },
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "mocha": "^2.4.5",
+  },
   "directories": {
     "test": "tests"
-  },
-  "devDependencies": {}
+  }
 }
