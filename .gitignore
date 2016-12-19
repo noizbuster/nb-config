@@ -37,8 +37,8 @@ jspm_packages
 .node_repl_history
 
 # specific files
-tests/user_config.json
-tests/user_config.yaml
+test/user_config.json
+test/user_config.yaml
 
 # specific directories
 temp
@@ -46,3 +46,7 @@ temp
 
 # specific file extension
 *.swp
+
+# OS metadata
+.DS_Store
+Thumbs.db
