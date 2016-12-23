@@ -18,13 +18,11 @@ Default.prototype.init = function (callback) {
                 if (error) {
                     console.error(error);
                     callback(error);
-                }
-                else {
+                } else {
                     callback(null);
                 }
             });
-        }
-        else {
+        } else {
             callback(null);
         }
     });
@@ -34,11 +32,10 @@ Default.prototype.initSync = function () {
         if (!fs.statSync(this.CONFIG_PATH)) {
             console.info('userconfig not exist, copy from default');
             this.copyDefaultSync();
+        } else {
+            // file exist, do nothing
         }
-        else {
-        }
-    }
-    catch (e) {
+    } catch (e) {
         console.info('userconfig not exist, copy from default');
         this.copyDefaultSync();
     }
@@ -48,19 +45,20 @@ Default.prototype.initSync = function () {
 Default.prototype.copyDefaultSync = function () {
     try {
         fse.copySync(this.DEFAULT_PATH, this.CONFIG_PATH);
-    }
-    catch (e) {
-        console.log("copied default configuration file");
+        return true;
+    } catch (e) {
+        console.error('copied default configuration file');
+        throw e;
     }
 };
 Default.prototype.copyDefault = function (callback) {
     fse.copy(this.DEFAULT_PATH, this.CONFIG_PATH, function (error) {
         if (error) {
-            callback(error);
-            return console.error(error);
-        }
-        else {
-            console.log("copied default configuration file");
+            console.error(error);
+            return callback(error);
+        } else {
+            console.log('copied default configuration file');
+            return callback();
         }
     });
 };
@@ -70,11 +68,9 @@ Default.prototype.readConfigsSync = function () {
     this.initSync();
     if (this.ext === '.json') {
         return fse.readJsonSync(this.CONFIG_PATH);
-    }
-    else if (this.ext === '.yaml' || this.ext === '.yml') {
-        return YAML.safeLoad(fs.readFileSync(this.CONFIG_PATH, 'utf8', null, json = true));
-    }
-    else {
+    } else if (this.ext === '.yaml' || this.ext === '.yml') {
+        return YAML.safeLoad(fs.readFileSync(this.CONFIG_PATH, 'utf8', null, {json: true}));
+    } else {
         console.log('invalid file extension : default.js support JSON, YAML, YML only');
         return undefined;
     }
@@ -86,35 +82,30 @@ Default.prototype.readConfigs = function (callback) {
                 console.error(error, status);
                 callback(error);
                 return null;
-            }
-            else {
+            } else {
                 fse.readJson(this.CONFIG_PATH, function (error, data) {
                     if (error) {
                         callback(error);
                         console.error(error);
                         return null;
-                    }
-                    else {
+                    } else {
                         callback(null, data);
                         return data;
                     }
                 });
             }
         });
-    }
-    else if (this.ext === '.yaml' || this.ext === '.yml') {
+    } else if (this.ext === '.yaml' || this.ext === '.yml') {
         this.init(function (error, status) {
             if (error) {
                 console.error(error, status);
                 callback(error);
                 return null;
-            }
-            else {
-                return YAML.safeLoad(fs.readFileSync(this.CONFIG_PATH, 'utf8', null, json = true));
+            } else {
+                return YAML.safeLoad(fs.readFileSync(this.CONFIG_PATH, 'utf8', null, {json: true}));
             }
         });
-    }
-    else {
+    } else {
         console.log('invalid file extension : default.js support JSON, YAML, YML only');
         callback(new Error());
         return false;
@@ -132,8 +123,7 @@ Default.prototype.setConfig = function (key, value, callback) {
         if (error) {
             callback(error);
             return false;
-        }
-        else {
+        } else {
             var settings = data;
             settings[key] = value;
             this.setConfigs(settings, function (err) {
@@ -141,8 +131,7 @@ Default.prototype.setConfig = function (key, value, callback) {
                     console.error(err);
                     callback(err);
                     return false;
-                }
-                else {
+                } else {
                     callback(null);
                     return true;
                 }
@@ -155,11 +144,9 @@ Default.prototype.setConfig = function (key, value, callback) {
 Default.prototype.setConfigsSync = function (settings) {
     if (this.ext === '.json') {
         return fse.writeJsonSync(this.CONFIG_PATH, settings);
-    }
-    else if (this.ext === '.yaml' || this.ext === '.yml') {
+    } else if (this.ext === '.yaml' || this.ext === '.yml') {
         return fs.writeFileSync(this.CONFIG_PATH, YAML.safeDump(settings), null);
-    }
-    else {
+    } else {
         console.log('invalid file extension : default.js support JSON, YAML, YML only');
         callback(new Error());
         return false;
@@ -172,25 +159,21 @@ Default.prototype.setConfigs = function (settings, callback) {
                 console.error(err);
                 callback(err);
                 return false;
-            }
-            else {
+            } else {
                 return true;
             }
         });
-    }
-    else if (this.ext === '.yaml' || this.ext === '.yml') {
+    } else if (this.ext === '.yaml' || this.ext === '.yml') {
         fs.writeFile(this.CONFIG_PATH, YAML.safeDump(settings), null, function (err) {
             if (err) {
                 console.error(err);
                 callback(err);
                 return false;
-            }
-            else {
+            } else {
                 return true;
             }
         });
-    }
-    else {
+    } else {
         console.log('invalid file extension : default.js support JSON, YAML, YML only');
         callback(new Error());
         return false;

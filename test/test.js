@@ -1,10 +1,10 @@
-var config = require('./default');
+var config = require('./../default');
 var fse = require('fs-extra');
-var TEST_DEFAULT_FILE_PATH = './tests/default_sample.json';
-var TEST_CONFIG_FILE_PATH = './tests/user_config.json';
+var TEST_DEFAULT_FILE_PATH = './test/default_sample.json';
+var TEST_CONFIG_FILE_PATH = './test/user_config.json';
 
-var TEST_DEFAULT_YAML_FILE_PATH = './tests/default_sample.yaml';
-var TEST_CONFIG_YAML_FILE_PATH = './tests/user_config.yaml';
+var TEST_DEFAULT_YAML_FILE_PATH = './test/default_sample.yaml';
+var TEST_CONFIG_YAML_FILE_PATH = './test/user_config.yaml';
 
 fse.removeSync(TEST_CONFIG_FILE_PATH);
 fse.removeSync(TEST_CONFIG_YAML_FILE_PATH);
