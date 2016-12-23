@@ -29,8 +29,10 @@
   },
   "homepage": "https://github.com/noizbuster/default.js#readme",
   "dependencies": {
+    "bluebird": "^3.4.7",
     "fs-extra": "^0.30.0",
-    "js-yaml": "^3.6.1"
+    "js-yaml": "^3.6.1",
+    "lodash": "^4.17.2"
   },
   "devDependencies": {
     "babel-cli": "^6.6.5",
