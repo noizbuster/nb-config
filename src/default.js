@@ -1,9 +1,10 @@
-var path = require('path');
-var fs = require('fs');
-var fse = require('fs-extra');
-var YAML = require('js-yaml');
+/*eslint no-console: 0*/
+const path = require('path');
+const fs = require('fs');
+const fse = require('fs-extra');
+const YAML = require('js-yaml');
 
-var Default = function (DEFAULT_PATH_PATH, USER_CONFIG_PATH) {
+let Default = function (DEFAULT_PATH_PATH, USER_CONFIG_PATH) {
     this.DEFAULT_PATH = DEFAULT_PATH_PATH;
     this.CONFIG_PATH = USER_CONFIG_PATH;
     this.ext = path.parse(this.CONFIG_PATH).ext.toLowerCase();
@@ -11,7 +12,7 @@ var Default = function (DEFAULT_PATH_PATH, USER_CONFIG_PATH) {
 
 // initialize and validate configuration files
 Default.prototype.init = function (callback) {
-    var stat = fs.stat(this.CONFIG_PATH, function (err, stats) {
+    let stat = fs.stat(this.CONFIG_PATH, function (err, stats) {
         if (err) {
             console.info('userconfig not exist, copy from default');
             this.copyDefault(function (error) {
@@ -148,8 +149,7 @@ Default.prototype.setConfigsSync = function (settings) {
         return fs.writeFileSync(this.CONFIG_PATH, YAML.safeDump(settings), null);
     } else {
         console.log('invalid file extension : default.js support JSON, YAML, YML only');
-        callback(new Error());
-        return false;
+        throw new Error('invalid file extension : default.js support JSON, YAML, YML only');
     }
 };
 Default.prototype.setConfigs = function (settings, callback) {

@@ -1,0 +1,12 @@
+extends: "eslint:recommended"
+
+#https://eslint.org/docs/user-guide/configuring#specifying-environments
+env:
+  node: true
+  es6: true
+
+parserOptions:
+  ecmaVersion: 9 # to use async / await
+
+rules:
+  no-unused-vars: warn

@@ -1,4 +1,6 @@
-var config = require('./../default');
+/* global describe, it, before */
+
+var config = require('./../lib/default.js');
 var fse = require('fs-extra');
 var TEST_DEFAULT_FILE_PATH = './test/default_sample.json';
 var TEST_CONFIG_FILE_PATH = './test/user_config.json';
@@ -46,5 +48,4 @@ console.log(yamlConfigManager.readConfigsSync());
 console.info('\nset Configs==========================================================');
 yamlConfigManager.setConfigSync('testString', 'new value !!!');
 console.log(yamlConfigManager.readConfigsSync());
-
 console.info('\nYAML Test Ended======================================================');
