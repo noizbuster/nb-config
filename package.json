@@ -1,8 +1,8 @@
 {
-  "name": "default.js",
+  "name": "nb-config",
   "version": "0.1.0",
   "description": "simple configuration manager",
-  "main": "lib/library.js",
+  "main": "lib/nb-config.js",
   "scripts": {
     "build": "webpack --env dev && webpack --env build && npm run test",
     "dev": "webpack --progress --colors --watch --env dev",
@@ -11,19 +11,21 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/noizbuster/default.js.git"
+    "url": "https://github.com/noizbuster/nb-config.git"
   },
   "keywords": [
-    "default",
+    "noizbuster",
+    "nb",
+    "nodejs",
     "configuration",
     "config"
   ],
   "author": "NoizBuster <noizbuster@noizbuster.com>",
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/noizbuster/default.js/issues"
+    "url": "https://github.com/noizbuster/nb-config/issues"
   },
-  "homepage": "https://github.com/noizbuster/default.js#readme",
+  "homepage": "https://github.com/noizbuster/nb-config#readme",
   "devDependencies": {
     "babel-cli": "^6.26.0",
     "babel-core": "^6.26.0",
