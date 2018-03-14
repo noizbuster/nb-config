@@ -10,3 +10,4 @@ parserOptions:
 
 rules:
   no-unused-vars: warn
+  no-console: 0
