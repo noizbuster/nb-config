@@ -23,6 +23,7 @@ class NBConfig {
      * @param {NBConfigOptions} [options]
      */
     constructor(moduleName, buildTarget, options) {
+        console.log('constructor: build target: ', buildTarget, process.env.NODE_ENV, 'development');
         this.moduleName = moduleName;
         this.options = options || {};
         this.cache = _.get(options, 'cache') || true;
@@ -141,8 +142,11 @@ class NBConfig {
         const userConfig = NBConfig.loadFile(configFilePath);
 
         console.log('defaultFilePath', defaultFilePath);
+        console.log('defaultConfig', defaultConfig);
         console.log('configFilePath', configFilePath);
+        console.log('userConfig', userConfig);
         this.config = utils.extendDeep(defaultConfig, userConfig);
+        console.log('merged:', this.config);
         if (this.cache) {
             this.setCache(this.config);
         }

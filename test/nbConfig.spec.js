@@ -52,6 +52,7 @@ let correctConfig = {
 
 describe('Initialize configuration files for test', () => {
     it('Make /config directory', () => {
+        delete process.env.NODE_ENV;
         fs.mkdirSync(path.join(__dirname, './../config'));
     });
 });
