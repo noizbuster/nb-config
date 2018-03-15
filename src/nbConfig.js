@@ -2,7 +2,8 @@ const path = require('path');
 const fs = require('fs');
 const _ = require('lodash');
 const YAML = require('js-yaml');
-const utils = require('utils');
+
+const utils = require('./utils');
 
 /**
  * @typedef {object} NBConfigOptions
@@ -17,27 +18,26 @@ const utils = require('utils');
 
 class NBConfig {
     /**
-     * @param {string} buildTarget
      * @param {string} [moduleName]
+     * @param {string} [buildTarget]
      * @param {NBConfigOptions} [options]
      */
-    constructor(buildTarget, moduleName, options) {
-        this.buildTarget = buildTarget;
+    constructor(moduleName, buildTarget, options) {
         this.moduleName = moduleName;
-        this.options = options;
+        this.options = options || {};
         this.cache = _.get(options, 'cache') || true;
         this.configDir = _.get(options, 'configDir') || process.env.NB_CONFIG_DIR || path.join(process.cwd(), 'config');
         this.defaultDir = _.get(options, 'defaultDir') || process.env.NB_DEFAULT_DIR || this.configDir;
-        this.buildTarget = _.get(options, 'buildTarget') || process.env.NODE_ENV || 'development';
+        this.buildTarget = buildTarget || process.env.NODE_ENV || 'development';
 
         this.load();
 
         return this;
     }
 
-    static fileName(buildTarget, moduleName) {
+    static fileName(moduleName, buildTarget) {
         return moduleName
-            ? moduleName.join(buildTarget, '.')
+            ? moduleName.concat('.', buildTarget)
             : buildTarget;
     }
 
@@ -54,7 +54,7 @@ class NBConfig {
 
         // filepath
         // TODO support other extensions (not only yaml)
-        const filename = NBConfig.fileName('default', this.moduleName) + '.yaml';
+        const filename = NBConfig.fileName(this.moduleName, 'default') + '.yaml';
         const defaultFilePath = path.join(this.defaultDir, filename);
         const configDefaultPath = path.join(this.configDir, filename);
 
@@ -92,11 +92,12 @@ class NBConfig {
      * @return {*}
      */
     load() {
-        this.prepareDefault();
         if (this.cache) {
             const cached = this.getCache();
             if (cached) {
+                console.log('load from cache');
                 this.config = cached;
+                _.set(this.options, 'fromCache', true);
                 return cached;
             }
         }
@@ -130,15 +131,17 @@ class NBConfig {
         // TODO support more extensions (not only yaml)
 
         // get default config
-        const defaultFileName = NBConfig.fileName('default', this.moduleName) + '.yaml';
+        const defaultFileName = NBConfig.fileName(this.moduleName, 'default') + '.yaml';
         const defaultFilePath = path.join(this.configDir, defaultFileName);
         const defaultConfig = NBConfig.loadFile(defaultFilePath);
 
         // get user config
-        const configFileName = NBConfig.fileName(this.buildTarget, this.moduleName) + '.yaml';
+        const configFileName = NBConfig.fileName(this.moduleName, this.buildTarget) + '.yaml';
         const configFilePath = path.join(this.configDir, configFileName);
         const userConfig = NBConfig.loadFile(configFilePath);
 
+        console.log('defaultFilePath', defaultFilePath);
+        console.log('configFilePath', configFilePath);
         this.config = utils.extendDeep(defaultConfig, userConfig);
         if (this.cache) {
             this.setCache(this.config);
@@ -149,10 +152,11 @@ class NBConfig {
 
     getCache() {
         if (this.cache) {
-            const symbolKey = Symbol.for(NBConfig.fileName(this.buildTarget, this.moduleName));
+            const symbolKey = Symbol.for(NBConfig.fileName(this.moduleName, this.buildTarget));
             let globalSymbols = Object.getOwnPropertySymbols(global);
             let cached = (globalSymbols.indexOf(symbolKey) > -1);
             if (cached) {
+                console.log('get data from cache:', symbolKey);
                 return global[symbolKey];
             } else {
                 return undefined;
@@ -167,10 +171,22 @@ class NBConfig {
      * @return {*} - echo of data
      */
     setCache(data) {
-        const symbolKey = Symbol.for(NBConfig.fileName(this.buildTarget, this.moduleName));
+        const symbolKey = Symbol.for(NBConfig.fileName(this.moduleName, this.buildTarget));
         global[symbolKey] = data;
 
+        console.log('put data into cache:', symbolKey);
         return global[symbolKey];
+    }
+
+    clearCache(targetSymbolKey){
+        if(targetSymbolKey) {
+            console.log('cache deleted:', targetSymbolKey);
+            delete global[targetSymbolKey];
+        } else {
+            const symbolKey = Symbol.for(NBConfig.fileName(this.moduleName, this.buildTarget));
+            console.log('cache deleted:', symbolKey);
+            delete global[symbolKey];
+        }
     }
 
     /**
@@ -181,8 +197,8 @@ class NBConfig {
      */
     get(path) {
         return path
-            ? this.config
-            : _.get(this.config, path);
+            ? _.get(this.config, path)
+            : this.config;
     }
 }
 
