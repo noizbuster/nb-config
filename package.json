@@ -2,12 +2,13 @@
   "name": "nb-config",
   "version": "0.1.0",
   "description": "simple configuration manager",
-  "main": "lib/nb-config.js",
+  "main": "lib/index.js",
   "scripts": {
-    "build": "webpack --env dev --mode development --progress && webpack --env build --mode development -p --progress&& npm run test",
-    "dev": "webpack --progress --colors --watch --env dev --mode development",
-    "test": "NODE_ENV=test mocha --require babel-core/register --colors ./test/*.spec.js",
-    "test:watch": "mocha --require babel-core/register --colors -w ./test/*.spec.js"
+    "test": "npm run lint && NODE_ENV=test mocha --colors ./test/*.spec.js",
+    "test:verbose": "npm run lint && NODE_ENV=test NB_CONFIG_VERBOSE=true mocha --colors ./test/*.spec.js",
+    "test:watch": "NODE_ENV=test && npm run lint && mocha --colors -w ./test/*.spec.js",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
   },
   "repository": {
     "type": "git",
@@ -27,24 +28,10 @@
   },
   "homepage": "https://github.com/noizbuster/nb-config#readme",
   "devDependencies": {
-    "babel-cli": "^6.26.0",
-    "babel-core": "^6.26.0",
-    "babel-eslint": "^8.0.3",
-    "babel-loader": "^7.1.2",
-    "babel-plugin-add-module-exports": "^0.2.1",
-    "babel-plugin-transform-runtime": "^6.23.0",
-    "babel-preset-env": "^1.6.1",
-    "babel-preset-es2015": "^6.24.1",
-    "babel-preset-stage-0": "^6.24.1",
     "chai": "^4.1.2",
     "eslint": "^4.18.2",
-    "eslint-loader": "^2.0.0",
     "fs-extra": "^5.0.0",
-    "mocha": "^4.0.1",
-    "uglifyjs-webpack-plugin": "^1.2.3",
-    "webpack": "^4.1.1",
-    "webpack-cli": "^2.0.12",
-    "yargs": "^10.0.3"
+    "mocha": "^4.0.1"
   },
   "dependencies": {
     "js-yaml": "^3.11.0",

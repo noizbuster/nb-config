@@ -8,8 +8,7 @@ const chai = require('chai');
 const expect = chai.expect;
 const should = chai.should();
 
-const nbConfig = require('./../lib/nb-config');
-// const nbConfig = require('./../src');
+const nbConfig = require('../lib');
 
 let defaultObj = {
     value1: 'value1',

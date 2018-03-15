@@ -1,5 +1,0 @@
-{
-    "testString": "test string foo bar!",
-    "testNumber": 1234,
-    "testObject": {"childValue1": 4000, "childValue2": "hoi"}
-}
