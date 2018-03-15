@@ -1,12 +1,10 @@
-/* global describe, it, before */
+/* global describe, it */
 const fs = require('fs');
 const fse = require('fs-extra');
 const path = require('path');
 const _ = require('lodash');
-
-const chai = require('chai');
-const expect = chai.expect;
-const should = chai.should();
+const chai = require('chai'), expect = chai.expect;
+chai.should();
 
 const nbConfig = require('../lib');
 
@@ -94,7 +92,6 @@ describe('Functional Test without options', () => {
     })
 
 });
-
 
 describe('Functional Test With Basic options', () => {
     let config;
