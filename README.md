@@ -57,7 +57,7 @@ __example project directory__
 |----myProject.development.yaml  
 |----myProject.production.yaml
 
-load configuration with specific __moduleName__ and __runningTarget(default is 'development')__ 
+load configuration with specific __moduleName__(default: name field on package.json) and __runningTarget(default is 'development')__ 
 ```javascript
 const Config = require('nb-config');
 let config = new Config('myProject', 'production');
