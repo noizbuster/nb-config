@@ -4,6 +4,7 @@ const fse = require('fs-extra');
 const path = require('path');
 const _ = require('lodash');
 const chai = require('chai'), expect = chai.expect;
+const pkg = require('../package');
 chai.should();
 
 const nbConfig = require('../lib');
@@ -47,6 +48,9 @@ let correctConfig = {
     "valueN": "newValue"
 };
 
+const defaultOptionDefault = path.join(__dirname, `./../config/${pkg.name}.default.yaml`);
+const defaultOptionDevelopment = path.join(__dirname, `./../config/${pkg.name}.development.yaml`);
+
 describe('Initialize configuration files for test', () => {
     it('Make /config directory', () => {
         delete process.env.NODE_ENV;
@@ -59,35 +63,35 @@ describe('Functional Test without options', () => {
 
     describe('Prepare Test', () => {
         it('Create ./config/default.yaml', () => {
-            fs.writeFileSync(path.join(__dirname, './../config/default.yaml'), JSON.stringify(defaultObj, null, 4));
+            fs.writeFileSync(defaultOptionDefault, JSON.stringify(defaultObj, null, 4));
         });
         it('Create ./config/development.yaml', () => {
-            fs.writeFileSync(path.join(__dirname, './../config/development.yaml'), JSON.stringify(configObj, null, 4));
+            fs.writeFileSync(defaultOptionDevelopment, JSON.stringify(configObj, null, 4));
         });
     });
 
     describe('Functional Test', () => {
         it('Create Instance of config by default', () => {
             config = new nbConfig();
-            config.config.should.not.equal(undefined);
+            config.config.should.not.equals(undefined);
         });
         it('Check config is loaded well', () => {
-            expect(_.isEqual(config.get(), correctConfig)).equals(true);
+            _.isEqual(config.get(), correctConfig).should.equals(true);
         });
         it('Cache test', () => {
             config = null;
             config = new nbConfig();
-            expect(config.options.fromCache).equals(true);
+            expect(config.fromCache).equals(true);
             expect(_.isEqual(config.get(), correctConfig)).equals(true);
         });
     });
 
     describe('Delete files that were used for testing', () => {
         it('Delete ./config/default.yaml', () => {
-            fs.unlinkSync(path.join(__dirname, './../config/default.yaml'));
+            fs.unlinkSync(defaultOptionDefault);
         });
         it('Create ./config/development.yaml', () => {
-            fs.unlinkSync(path.join(__dirname, './../config/development.yaml'));
+            fs.unlinkSync(defaultOptionDevelopment);
         });
     })
 
@@ -108,7 +112,7 @@ describe('Functional Test With Basic options', () => {
     describe('Functional Test', () => {
         it('Create Instance of config with moduleName', () => {
             config = new nbConfig('myProject');
-            config.config.should.not.equal(undefined);
+            config.config.should.not.equals(undefined);
         });
         it('Check config is loaded well', () => {
             expect(_.isEqual(config.get(), defaultObj)).equals(true);
@@ -119,7 +123,7 @@ describe('Functional Test With Basic options', () => {
             config = null;
             process.env.NODE_ENV = "production";
             config = new nbConfig('myProject');
-            config.config.should.not.equal(undefined);
+            config.config.should.not.equals(undefined);
             expect(_.isEqual(config.get(), correctConfig)).equals(true);
         });
 
@@ -127,14 +131,14 @@ describe('Functional Test With Basic options', () => {
             config = null;
             delete process.env.NODE_ENV;
             config = new nbConfig('myProject', 'production');
-            config.config.should.not.equal(undefined);
+            config.config.should.not.equals(undefined);
             expect(_.isEqual(config.get(), correctConfig)).equals(true);
         });
 
         it('Cache test', () => {
             config = null;
             config = new nbConfig('myProject', 'production');
-            expect(config.options.fromCache).equals(true);
+            expect(config.fromCache).equals(true);
             expect(_.isEqual(config.get(), correctConfig)).equals(true);
         });
     });

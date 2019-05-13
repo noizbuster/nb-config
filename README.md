@@ -136,7 +136,7 @@ Once the value is found, the rest is passed.
 
 ### (optional) options
 
-* cache: (boolean) mark use cache or not (default is true).
+* cache: (boolean) mark use cache or not (default is true). If config loaded from cache `config.fromCache` marked `true`
 * configDir: (string) directory where configurations stored
     * Loading Order: `options.configDir` > process.env.`NB_CONFIG_DIR` > `process.cwd()/config`(as default)
 * defaultDir: (string) directory where *.default.ext file stored
