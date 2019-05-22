@@ -30,7 +30,7 @@
   "devDependencies": {
     "chai": "^4.2.0",
     "eslint": "^5.16.0",
-    "fs-extra": "^8.0.0",
+    "fs-extra": "^8.0.1",
     "mocha": "^6.1.4"
   },
   "dependencies": {
