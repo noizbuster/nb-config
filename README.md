@@ -137,6 +137,10 @@ Once the value is found, the rest is passed.
 ### (optional) options
 
 * cache: (boolean) mark use cache or not (default is true). If config loaded from cache `config.fromCache` marked `true`
+* env: (boolean) let environment variables overwrite file configuration if exist. (default is true)
+    * User can assign not only single config (e.g. "port") but also nested configuration path (e.g. database.url)
+        * Environment variables will be cast to the same type as the value specified in the configuration file.
+        * `__` is a default delimiter of configuration path (e.g. path `database.url` --> `EXPORT database__url=URL_VALUE`)
 * configDir: (string) directory where configurations stored
     * Loading Order: `options.configDir` > process.env.`NB_CONFIG_DIR` > `process.cwd()/config`(as default)
 * defaultDir: (string) directory where *.default.ext file stored

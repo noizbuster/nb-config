@@ -31,21 +31,15 @@ let configObj = {
 };
 
 let correctConfig = {
-    "value1": "value1",
-    "value2": "value2",
-    "valueA": [
-        "arr1",
-        "arr2"
-    ],
-    "valueDeep": {
-        "valueAD": [
-            "deepArr1",
-            "deepArr2"
-        ],
-        "valueD": "valueDeep",
-        "valueI": 10
+    'value1': 'value1',
+    'value2': 'value2',
+    'valueA': ['arr1', 'arr2'],
+    'valueDeep': {
+        'valueAD': ['deepArr1', 'deepArr2'],
+        'valueD': 'valueDeep',
+        'valueI': 10
     },
-    "valueN": "newValue"
+    'valueN': 'newValue'
 };
 
 const defaultOptionDefault = path.join(__dirname, `./../config/${pkg.name}.default.yaml`);
@@ -93,7 +87,7 @@ describe('Functional Test without options', () => {
         it('Create ./config/development.yaml', () => {
             fs.unlinkSync(defaultOptionDevelopment);
         });
-    })
+    });
 
 });
 
@@ -104,6 +98,7 @@ describe('Functional Test With Basic options', () => {
         it('Create ./config/myProject.default.yaml', () => {
             fs.writeFileSync(path.join(__dirname, './../config/myProject.default.yaml'), JSON.stringify(defaultObj, null, 4));
         });
+
         it('Create ./config/myProject.production.yaml', () => {
             fs.writeFileSync(path.join(__dirname, './../config/myProject.production.yaml'), JSON.stringify(configObj, null, 4));
         });
@@ -114,6 +109,7 @@ describe('Functional Test With Basic options', () => {
             config = new nbConfig('myProject');
             config.config.should.not.equals(undefined);
         });
+
         it('Check config is loaded well', () => {
             expect(_.isEqual(config.get(), defaultObj)).equals(true);
         });
@@ -121,9 +117,10 @@ describe('Functional Test With Basic options', () => {
         it('Create Instance of config with moduleName and NODE_ENV="production"', () => {
             config.clearCache();
             config = null;
-            process.env.NODE_ENV = "production";
+            process.env.NODE_ENV = 'production';
             config = new nbConfig('myProject');
             config.config.should.not.equals(undefined);
+            config.get('valueDeep.valueI').should.equals(10);
             expect(_.isEqual(config.get(), correctConfig)).equals(true);
         });
 
@@ -143,14 +140,36 @@ describe('Functional Test With Basic options', () => {
         });
     });
 
+    describe('Env Overwrite Test', () => {
+        it('Create Instance of config with moduleName', () => {
+            process.env.value1 = 'value1FromEnv';
+            process.env.valueDeep__valueI = '20';
+
+            config = new nbConfig('myProject');
+            config.config.should.not.equals(undefined);
+        });
+
+        it('env test', () => {
+            config.get('value1').should.equals('value1FromEnv');
+            config.get('valueDeep.valueI').should.equals(20);
+        });
+
+        it('Unset Env', () => {
+            config.clearCache();
+            delete process.env.value1;
+            delete process.env.valueDeep__valueI;
+        });
+    });
+
     describe('Delete files that were used for testing', () => {
         it('Delete ./config/default.yaml', () => {
             fs.unlinkSync(path.join(__dirname, './../config/myProject.default.yaml'));
         });
+
         it('Create ./config/development.yaml', () => {
             fs.unlinkSync(path.join(__dirname, './../config/myProject.production.yaml'));
         });
-    })
+    });
 
 });
 
